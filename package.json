@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.10.2",
+    "@tensorflow-models/handpose": "0.0.5",
+    "@tensorflow/tfjs-backend-webgl": "^2.0.1",
+    "@tensorflow/tfjs-converter": "^2.0.1",
+    "@tensorflow/tfjs-core": "^2.0.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
