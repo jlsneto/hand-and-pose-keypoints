@@ -10,6 +10,13 @@ function App() {
     const canvas = createRef();
     // const model = handpose.load();
     let model = null;
+    const fingerLookupIndices = {
+        thumb: [0, 1, 2, 3, 4],
+        indexFinger: [0, 5, 6, 7, 8],
+        middleFinger: [0, 9, 10, 11, 12],
+        ringFinger: [0, 13, 14, 15, 16],
+        pinky: [0, 17, 18, 19, 20]
+    };
 
     async function setupWebcam() {
         return new Promise((resolve, reject) => {
@@ -32,28 +39,28 @@ function App() {
         });
     }
 
-    function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
-        for (let i = 0; i < keypoints.length; i++) {
-            const keypoint = keypoints[i];
+    function drawKeypoints(ctx, keypoints) {
 
-            if (keypoint.score < minConfidence) {
-                continue;
-            }
-
-            const {y, x} = keypoint.position;
-            drawPoint(ctx, y * scale, x * scale, 3, "#FFFF");
+        const fingers = Object.keys(fingerLookupIndices);
+        for (let i = 0; i < fingers.length; i++) {
+            const finger = fingers[i];
+            const points = fingerLookupIndices[finger].map(idx => keypoints[idx]);
+            drawPath(ctx, points, false);
         }
     }
 
-    function drawPoint(ctx, y, x, r, color) {
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, 10 * Math.PI);
-        ctx.fillStyle = color;
-        ctx.fill();
-    }
+    function drawPath(ctx, points, closePath) {
+        const region = new Path2D();
+        region.moveTo(points[0][0], points[0][1]);
+        for (let i = 1; i < points.length; i++) {
+            const point = points[i];
+            region.lineTo(point[0], point[1]);
+        }
 
-    function toTuple({y, x}) {
-        return [y, x];
+        if (closePath) {
+            region.closePath();
+        }
+        ctx.stroke(region);
     }
 
     async function drawImge(){
@@ -109,16 +116,10 @@ function App() {
                         ctx.fillStyle = "#FFFF";
                         ctx.fill();
                     }
+                    drawKeypoints(ctx, keypoints)
                 }
             }
-            // var faceArea = 300;
-            // var pX=_canvas.width/2 - faceArea/2;
-            // var pY=_canvas.height/2 - faceArea/2;
-            //
-            // ctx.rect(pX,pY,faceArea,faceArea);
-            // ctx.lineWidth = "6";
-            // ctx.strokeStyle = "red";
-            ctx.stroke();
+            console.log(predictions.length);
 
 
             setTimeout(drawImge, 10);
